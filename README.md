@@ -23,3 +23,4 @@ The app uses a PostgreSQL database with the following tables:
 - `meals` table – stores user-generated recipes
 
 ![landing_page_img](landing_page_img.png)
+![landing_page_img](generator_page_img.png)
