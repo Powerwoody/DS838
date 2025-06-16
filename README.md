@@ -1,6 +1,6 @@
 # Recipe Generator project
 
-A full-stack web application for generating and saving personalized recipes.
+A full-stack web application for generating and saving personalized recipes. A fun project to deepen my understanding of web development.
 
 ## Tech Stack:
 
