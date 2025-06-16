@@ -1,8 +1,23 @@
-# DS838
-**Web development course project**
+# Recipie Generator project
 
-The project is a full-stack project, using HTML, CSS, and JS for the frontend and Flask for the backend.  
+A full-stack web application for generating and saving personalized recipes.
 
-We want to develop an webapp that utilizes OpenAI's REST API to extract discounted grocery items from weekly discount flyers and generate meal suggestions based on those deals.
+## Tech Stack:
 
-Users can log in, save suggested dishes to their personal dashboard, and assign meals to specific days. The app also includes filtering options, such as star indicators for groceries sourced only from Europe, organic products, and country-specific dishes. Additionally, users can export their weekly meal plan to their personal calendar for seamless integration into their schedule. 
+- **Frontend**: HTML, CSS, JavaScript
+- **Backend**: Flask
+- **Database**: PostgreSQL
+- **LLM Integration**: Gemini API for recipe generation
+
+## Features:
+
+- User registration and login
+- Recipe generation based on selected filters using the **Gemini API**
+- Saving favorite meals to the user profile
+- Generating personalized shopping lists based on saved meals
+
+## Database: 
+
+The app uses a PostgreSQL database with the following tables:
+- `users` table – stores user credentials
+- `meals` table – stores user-generated recipes
