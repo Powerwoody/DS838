@@ -1,4 +1,4 @@
-# Recipie Generator project
+# Recipe Generator project
 
 A full-stack web application for generating and saving personalized recipes.
 
