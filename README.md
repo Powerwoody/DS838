@@ -21,3 +21,5 @@ A full-stack web application for generating and saving personalized recipes.
 The app uses a PostgreSQL database with the following tables:
 - `users` table – stores user credentials
 - `meals` table – stores user-generated recipes
+
+![landing_page_img](landing_page_img.png)
