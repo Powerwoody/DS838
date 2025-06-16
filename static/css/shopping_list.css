@@ -1,0 +1,191 @@
+@import url('base.css');
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--main-container-bg-color);
+    padding: 40px;
+}
+
+main h1 {
+    color: var(--text-color);
+    padding: 20px;
+}
+
+main ul {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 600px;
+}
+
+main ul li {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+main ul li input {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 40px;
+    height: 40px;
+    border: 2.5px solid #4CAF50;
+    border-radius: 10px;
+    margin-right: 20px;
+    position: relative;
+    background-color: var(--bg-color);
+}
+
+main ul li input:checked {
+    background-color: #4CAF50;
+}
+
+main ul li input:checked:after {
+    content: '✓';
+    font-size: 30px;
+    color: white;
+    position: absolute;
+    top: 0;
+    left: 4px;
+}
+
+main ul li label {
+    color: var(--text-color);
+    cursor: pointer;
+    user-select: none;
+    font-size: 20px;
+    transition: all 0.3s;
+}
+
+/* Action buttons */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    gap: 15px;
+}
+
+.action-button {
+    padding: 12px 25px;
+    background-color: var(--bg-color-nav-main-buttons);
+    color: var(--text-color);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.action-button:hover {
+    background-color: var(--bg-color-main-buttons-hover);
+    color: var(--text-color-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.action-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 3px rgba(0,0,0,0.15);
+}
+
+/* Status message */
+#status-message {
+    text-align: center;
+    margin: 15px 0;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    max-width: 600px;
+    width: 100%;
+}
+
+.success-message {
+    color: var(--text-color);
+    background-color: rgba(76, 175, 80, 0.2);
+    border: 1px solid rgba(76, 175, 80, 0.5);
+}
+
+.error-message {
+    color: var(--text-color);
+    background-color: rgba(244, 67, 54, 0.2);
+    border: 1px solid rgba(244, 67, 54, 0.5);
+}
+
+/* Responsive design */
+@media (max-width: 700px) {
+    main {
+        padding: 20px;
+    }
+    
+    main ul {
+        padding: 0 15px;
+    }
+    
+    main ul li input {
+        width: 30px;
+        height: 30px;
+    }
+    
+    main ul li input:checked:after {
+        font-size: 20px;
+        left: 2px;
+    }
+    
+    main ul li label {
+        font-size: 16px;
+    }
+    
+    .action-button {
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+}
+
+#shopping-list li {
+    margin: 10px 0;
+}
+#shopping-list input[type="checkbox"] {
+    margin-right: 10px;
+}
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+.action-button {
+    padding: 10px 20px;
+    background-color: var(--bg-color-nav-main-buttons);
+    color: var(--text-color);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.action-button:hover {
+    background-color: var(--bg-color-main-buttons-hover);
+    color: var(--text-color-hover);
+}
+#status-message {
+    text-align: center;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+.success-message {
+    color: var(--text-color);
+    background-color: rgba(0, 128, 0, 0.1);
+}
+.error-message {
+    color: var(--text-color);
+    background-color: rgba(255, 0, 0, 0.1);
+}

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping List{% endblock %}
+
+{% block extra_head_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Loading shopping list');
+        const shoppingList = document.getElementById('shopping-list');
+        const statusMessage = document.getElementById('status-message');
+        const clearListButton = document.getElementById('clear-list');
+        
+        // Loading checked state from localStorage:
+        let checkedItems = {};
+        try {
+            const savedCheckedItems = localStorage.getItem('checkedItems');
+            if (savedCheckedItems) {
+                checkedItems = JSON.parse(savedCheckedItems);
+                console.log('Loaded checked items from localStorage:', checkedItems);
+            }
+        } catch (error) {
+            console.error('Error loading checked items:', error);
+            // If there's an error, start with a clean slate:
+            checkedItems = {};
+        }
+        
+        // Saving checked state to localStorage:
+        function saveCheckedState() {
+            localStorage.setItem('checkedItems', JSON.stringify(checkedItems));
+            console.log('Saved checked items to localStorage:', checkedItems);
+        }
+        
+        // Clearing shopping list button:
+        clearListButton.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear the shopping list?')) {
+                clearShoppingList();
+            }
+        });
+        
+        function clearShoppingList() {
+            fetch('/clear-shopping-list', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    statusMessage.textContent = data.message || 'Shopping list cleared!';
+                    statusMessage.className = 'success-message';
+                    
+                    // Clearing the local display:
+                    shoppingList.innerHTML = '<li>No items in shopping list</li>';
+                    
+                    // Also clear localStorage for shopping list items:
+                    localStorage.removeItem('shoppingList');
+                    
+                    // Clearing checked items:
+                    checkedItems = {};
+                    saveCheckedState();
+                } else {
+                    statusMessage.textContent = data.message || 'Failed to clear shopping list';
+                    statusMessage.className = 'error-message';
+                }
+            })
+            .catch(error => {
+                console.error('Error clearing shopping list:', error);
+                statusMessage.textContent = `Error: ${error.message}`;
+                statusMessage.className = 'error-message';
+            });
+        }
+        
+        // Function to create a list item with proper checked state:
+        function createListItem(item, index) {
+            const li = document.createElement('li');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `item${index}`;
+            
+            // Setting checked state based on localStorage:
+            const isChecked = checkedItems[item] === true;
+            checkbox.checked = isChecked;
+            
+            const label = document.createElement('label');
+            label.htmlFor = `item${index}`;
+            label.textContent = item;
+            
+            // Applying styles based on checked state:
+            if (isChecked) {
+                label.style.textDecoration = 'line-through';
+                label.style.opacity = '0.6';
+            }
+            
+            // Saving checkbox state when changed:
+            checkbox.addEventListener('change', function() {
+                checkedItems[item] = this.checked;
+                saveCheckedState();
+                
+                if (this.checked) {
+                    label.style.textDecoration = 'line-through';
+                    label.style.opacity = '0.6';
+                } else {
+                    label.style.textDecoration = 'none';
+                    label.style.opacity = '1';
+                }
+            });
+            
+            li.appendChild(checkbox);
+            li.appendChild(label);
+            return li;
+        }
+        
+        try {
+            // Checking if ingredients are available from the session:
+            {% if session.get('shopping_list') %}
+                const ingredients = {{ session.get('shopping_list') | tojson }};
+                console.log('Retrieved ingredients from session:', ingredients);
+                
+                shoppingList.innerHTML = '';
+                
+                if (!Array.isArray(ingredients) || ingredients.length === 0) {
+                    const li = document.createElement('li');
+                    li.textContent = 'No items in shopping list';
+                    shoppingList.appendChild(li);
+                } else {
+                    ingredients.forEach((item, index) => {
+                        const listItem = createListItem(item, index);
+                        shoppingList.appendChild(listItem);
+                    });
+                }
+            {% else %}
+                // Fallback to local storage if no session data:
+                const ingredients = JSON.parse(localStorage.getItem('shoppingList')) || [];
+                console.log('Retrieved ingredients from localStorage:', ingredients);
+                
+                shoppingList.innerHTML = '';
+                
+                if (!Array.isArray(ingredients) || ingredients.length === 0) {
+                    const li = document.createElement('li');
+                    li.textContent = 'No ingredients';
+                    shoppingList.appendChild(li);
+                } else {
+                    ingredients.forEach((item, index) => {
+                        const listItem = createListItem(item, index);
+                        shoppingList.appendChild(listItem);
+                    });
+                }
+            {% endif %}
+        } catch (error) {
+            console.error('Error loading shopping list:', error);
+            shoppingList.innerHTML = '<li>Error loading shopping list. Please try again.</li>';
+        }
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shopping_list.css') }}">
+{% endblock %}
+
+{% block content %}
+    <main>
+        <h1>Ingredients</h1>
+        <div id="status-message"></div>
+        <ul id="shopping-list">
+            <!-- Ingredients will be populated by JavaScript -->
+        </ul>
+        <div class="action-buttons">
+            <button id="clear-list" class="action-button">Clear List</button>
+        </div>
+    </main>
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}

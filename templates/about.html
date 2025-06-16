@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}page_title{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="about-container">
+        <div class="about-text-container">
+            <h1>About Us</h1>
+            <h3>Welcome to your new everyday food!</h3>
+            <p class="about-text">We created this platform with one goal in mind: to make everyday meals easier, smarter, and more inspiring – without compromising your values or your wallet. Using AI-generated recipes and ideas based on Netto’s product catalog, we help you find delicious and easy dishes that match exactly what you care about. Choose from three focus areas:</p>
+            <ul>
+                <li>
+                    <b>Budget Friendly</b> – Flavorful dishes that stretch your budget further
+                </li>
+                <li>
+                    <b>Organic</b> – Recipes focused on sustainability and clean ingredients
+                </li>
+                <li>
+                    <b>European produced</b> – Meal ideas based on products with European ingredients
+                </li>
+            </ul>
+            <h3>Food shouldn’t be a burden – it should be a pleasure!</h3>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
+
+{% block footer %}
+{% endblock %}

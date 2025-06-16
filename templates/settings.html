@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Account Settings{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="login-container">
+        <h2>Account Settings</h2>
+        <h5 style="color: red;">{{error_message}}</h5>
+        <h5 style="color: green;">{{success_message}}</h5>
+        <form action="/settings" method="POST" class="login-form" id="settings-form">            
+            <div class="form-group">
+                <label for="current_password">Current Password:</label> <br>
+                <input type="password" id="current_password" name="current_password" placeholder="Enter current password" required>
+                <div class="error-message" id="current-password-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="new_password">New Password:</label> <br>
+                <input type="password" id="new_password" name="new_password" placeholder="Enter new password" required>
+                <div class="error-message" id="new-password-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password">Confirm New Password:</label> <br>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm new password" required>
+                <div class="error-message" id="confirm-password-error"></div>
+            </div>
+            
+            <button type="submit" class="login-button"><b>Save Changes</b></button>
+        </form>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_head_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const settingsForm = document.getElementById('settings-form');
+    const settingsMessage = document.getElementById('settings-message');
+    const loginContainer = document.querySelector('.login-container');
+
+    // Fading in animation:
+    if (loginContainer) {
+        setTimeout(() => {
+            loginContainer.style.animation = 'fadeIn 0.8s ease-in forwards';
+            loginContainer.style.opacity = 1;
+        }, 100);
+    }
+
+    // Handling form submission:
+    if (settingsForm) {
+        settingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Clearing previous error messages:
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.textContent = '';
+            });
+            document.querySelectorAll('input').forEach(input => {
+                input.classList.remove('input-error');
+            });
+
+            const currentPassword = document.getElementById('current_password').value;
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+
+            // Client-side validation:
+            let hasError = false;
+
+            if (!currentPassword) {
+                document.getElementById('current-password-error').textContent = 'Current password is required';
+                document.getElementById('current_password').classList.add('input-error');
+                hasError = true;
+            }
+
+            if (!newPassword) {
+                document.getElementById('new-password-error').textContent = 'New password is required';
+                document.getElementById('new_password').classList.add('input-error');
+                hasError = true;
+            }
+
+            if (!confirmPassword) {
+                document.getElementById('confirm-password-error').textContent = 'Please confirm new password';
+                document.getElementById('confirm_password').classList.add('input-error');
+                hasError = true;
+            }
+
+            if (newPassword && confirmPassword && newPassword !== confirmPassword) {
+                document.getElementById('confirm-password-error').textContent = 'New passwords do not match';
+                document.getElementById('new_password').classList.add('input-error');
+                document.getElementById('confirm_password').classList.add('input-error');
+                hasError = true;
+            }
+
+            if (!hasError) {
+                // Submitting the form:
+                settingsForm.submit();
+            }
+        });
+    }
+
+    // Displaying server-side messages if present:
+    const errorMessage = "{{ error_message | safe }}";
+    const successMessage = "{{ success_message | safe }}";
+    
+    if (errorMessage && settingsMessage) {
+        settingsMessage.textContent = errorMessage;
+        settingsMessage.classList.remove('hidden', 'success');
+        settingsMessage.classList.add('error');
+    } else if (successMessage && settingsMessage) {
+        settingsMessage.textContent = successMessage;
+        settingsMessage.classList.remove('hidden', 'error');
+        settingsMessage.classList.add('success');
+    }
+});
+</script>
+{% endblock %}

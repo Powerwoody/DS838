@@ -1,0 +1,75 @@
+@import url('base.css');
+
+:root {
+    --main-container-bg-color: white;
+}
+
+.darkmode {
+    --main-container-bg-color: #979797;
+}
+
+.about-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-image: url('../images/about_page_background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--bg-color-footer);
+    background-blend-mode: overlay;
+    padding: 20px;
+}
+
+.about-container h1 {
+    font-size: 2rem;
+    color: var(--text-color);
+    padding: 20px;
+}
+
+.about-container p {
+    font-size: 20px;
+    color: var(--text-color);
+    padding: 20px;
+}
+
+.about-text {
+    text-align: center;
+}
+
+.about-container ul {
+    text-align: center;
+    list-style-type: none;
+    color: var(--text-color);
+}
+
+.about-container ul li {
+    padding: 10px;
+}
+
+.about-container h3 {
+    color: var(--text-color);
+    padding: 20px;
+    text-align: center;
+}
+
+.about-text-container {
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    border-radius: 20px;
+    background-color: var(--main-container-bg-color);
+}
+
+
+@media (max-width: 630px) {
+    .about-text-container {
+        width: 100%;
+    }
+}
+ 

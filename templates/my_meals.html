@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}My Meals{% endblock %}
+
+{% block body_attributes %}onload="loadMeals()"{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/my_meals.css') }}">
+{% endblock %}
+
+{% block extra_head_scripts %}
+<script>
+    function loadMeals() {
+        const container = document.getElementById('saved-meals-container');
+        container.innerHTML = '';
+        
+        const statusMessage = document.getElementById('status-message');
+        statusMessage.textContent = 'Loading meals...';
+        statusMessage.className = '';
+        
+        fetch('/get-saved-meals')
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(`Failed to fetch saved meals: ${response.status} ${response.statusText}. ${data.message || ''}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Received data:", data);
+                
+                if (!data.success) {
+                    throw new Error(data.message || 'Unknown error');
+                }
+                
+                const meals = data.meals;
+                
+                if (meals.length === 0) {
+                    statusMessage.textContent = 'You have no saved meals yet. Generate and save some meals first!';
+                    statusMessage.className = 'info-message';
+                } else {
+                    statusMessage.textContent = `Successfully loaded ${meals.length} meals!`;
+                    statusMessage.className = 'success-message';
+                    
+                    window.allMeals = meals;
+                    meals.forEach(meal => displayMeal(meal, container));
+                    setupSearch();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching meals:', error);
+                statusMessage.textContent = `Error: ${error.message}`;
+                statusMessage.className = 'error-message';
+            });
+    }
+    
+    function displayMeal(meal, container) {
+        const mealCard = document.createElement('div');
+        mealCard.className = 'meal-card';
+        mealCard.dataset.title = meal.title.toLowerCase();
+        
+        const mealTitle = document.createElement('div');
+        mealTitle.className = 'meal-title';
+        mealTitle.textContent = meal.title;
+        
+        const ingredientsTitle = document.createElement('h3');
+        ingredientsTitle.textContent = 'Ingredients:';
+        
+        const ingredientsList = document.createElement('ul');
+        ingredientsList.className = 'meal-ingredients';
+        
+        if (Array.isArray(meal.ingredients)) {
+            meal.ingredients.forEach(ingredient => {
+                const li = document.createElement('li');
+                li.textContent = ingredient;
+                ingredientsList.appendChild(li);
+            });
+        } else {
+            console.warn("Ingredients is not an array:", meal.ingredients);
+            const li = document.createElement('li');
+            li.textContent = String(meal.ingredients);
+            ingredientsList.appendChild(li);
+        }
+        
+        const recipeTitle = document.createElement('h3');
+        recipeTitle.textContent = 'Recipe:';
+        
+        const recipeText = document.createElement('div');
+        recipeText.className = 'meal-recipe';
+        recipeText.textContent = meal.recipe;
+        
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'button-container';
+        
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.className = "delete-button";
+        deleteButton.onclick = function() {
+            if (confirm(`Are you sure you want to delete "${meal.title}"?`)) {
+                deleteMeal(meal.title);
+            }
+        };
+        
+        const shoppingListButton = document.createElement('button');
+        shoppingListButton.textContent = 'Add to ingredients';
+        shoppingListButton.className = "shop-button";
+        shoppingListButton.onclick = function() {
+            addToShoppingList(meal.title);
+        };
+        
+        buttonContainer.appendChild(deleteButton);
+        buttonContainer.appendChild(shoppingListButton);
+        
+        mealCard.appendChild(mealTitle);
+        mealCard.appendChild(ingredientsTitle);
+        mealCard.appendChild(ingredientsList);
+        mealCard.appendChild(recipeTitle);
+        mealCard.appendChild(recipeText);
+        mealCard.appendChild(buttonContainer);
+        
+        container.appendChild(mealCard);
+    }
+    
+    function deleteMeal(mealTitle) {
+        const statusMessage = document.getElementById('status-message');
+        statusMessage.textContent = `Deleting "${mealTitle}"...`;
+        statusMessage.className = 'info-message';
+        
+        fetch('/delete-meal', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title: mealTitle })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                statusMessage.textContent = data.message || `Meal "${mealTitle}" deleted successfully!`;
+                statusMessage.className = 'success-message';
+                // Reloading meals to update the UI:
+                loadMeals();
+            } else {
+                statusMessage.textContent = data.message || `Failed to delete meal "${mealTitle}"`;
+                statusMessage.className = 'error-message';
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting meal:', error);
+            statusMessage.textContent = `Error: ${error.message}`;
+            statusMessage.className = 'error-message';
+        });
+    }
+    
+    function addToShoppingList(mealTitle) {
+        const statusMessage = document.getElementById('status-message');
+        statusMessage.textContent = `Adding "${mealTitle}" ingredients to shopping list...`;
+        statusMessage.className = 'info-message';
+        
+        fetch('/add-to-shopping-list', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title: mealTitle })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                statusMessage.textContent = data.message || `Ingredients for "${mealTitle}" added to shopping list!`;
+                statusMessage.className = 'success-message';
+                
+                // Redirecting to shopping list page:
+                setTimeout(() => {
+                    window.location.href = '/shopping_list';
+                }, 1000);
+            } else {
+                statusMessage.textContent = data.message || `Failed to add ingredients to shopping list`;
+                statusMessage.className = 'error-message';
+            }
+        })
+        .catch(error => {
+            console.error('Error adding to shopping list:', error);
+            statusMessage.textContent = `Error: ${error.message}`;
+            statusMessage.className = 'error-message';
+        });
+    }
+    
+    function setupSearch() {
+        const searchInput = document.getElementById('meal-search');
+        const searchButton = document.getElementById('search-button');
+        const container = document.getElementById('saved-meals-container');
+        const statusMessage = document.getElementById('status-message');
+        
+        function filterMeals() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                container.innerHTML = '';
+                window.allMeals.forEach(meal => displayMeal(meal, container));
+                statusMessage.textContent = `Showing all ${window.allMeals.length} meals`;
+                statusMessage.className = 'info-message';
+                return;
+            }
+            
+            const filteredMeals = window.allMeals.filter(meal => 
+                meal.title.toLowerCase().includes(searchTerm) ||
+                meal.recipe.toLowerCase().includes(searchTerm) ||
+                (Array.isArray(meal.ingredients) && meal.ingredients.some(ing => 
+                    ing.toLowerCase().includes(searchTerm)
+                ))
+            );
+            
+            container.innerHTML = '';
+            
+            if (filteredMeals.length === 0) {
+                statusMessage.textContent = `No meals found matching "${searchInput.value}"`;
+                statusMessage.className = 'info-message';
+            } else {
+                filteredMeals.forEach(meal => displayMeal(meal, container));
+                statusMessage.textContent = `Found ${filteredMeals.length} meal(s) matching "${searchInput.value}"`;
+                statusMessage.className = 'success-message';
+            }
+        }
+        
+        searchButton.addEventListener('click', filterMeals);
+        searchInput.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                filterMeals();
+            }
+        });
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+    <main class="main">
+        <div class="search-bar">
+            <p class="search-bar-title">My Saved Meals</p>
+            <div class="search-input-container">
+                <input type="text" id="meal-search" placeholder="Search meals..." class="search-input">
+                <button id="search-button" class="search-button">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div id="status-message"></div>
+        
+        <div class="main_container" id="saved-meals-container">
+            <!-- Saved meals will be displayed here -->
+        </div>
+    </main>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
